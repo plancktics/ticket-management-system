@@ -18,6 +18,7 @@ import com.tics.ticket_management_system.repository.TicketRepository;
 public class DataInitializer {
 
     @Bean
+    @SuppressWarnings("unused")
     CommandLineRunner initDatabase(EventRepository eventRepository, TicketRepository ticketRepository) {
         return args -> {
             System.out.println("====== POPULATING DATABASE WITH TEST DATA ======");
