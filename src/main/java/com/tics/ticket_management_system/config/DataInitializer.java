@@ -2,7 +2,6 @@ package com.tics.ticket_management_system.config;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -35,15 +34,15 @@ public class DataInitializer {
 
             // 2. Create and save Tickets for the Rock Concert
             Ticket ticket1 = new Ticket();
-            ticket1.setTicketCode(UUID.randomUUID().toString()); // Generates a unique secure string
+            ticket1.setTicketCode("a"); // Generates a unique secure string
             ticket1.setPrice(new BigDecimal("85.50"));
             ticket1.setStatus(TicketStatus.AVAILABLE);
             ticket1.setEvent(rockEvent); // Establishing the @ManyToOne relationship
 
             Ticket ticket2 = new Ticket();
-            ticket2.setTicketCode(UUID.randomUUID().toString());
+            ticket2.setTicketCode("b");
             ticket2.setPrice(new BigDecimal("150.00"));
-            ticket2.setStatus(TicketStatus.RESERVED);
+            ticket2.setStatus(TicketStatus.AVAILABLE);
             ticket2.setEvent(rockEvent);
 
             ticketRepository.save(ticket1);

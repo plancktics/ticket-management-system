@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tics.ticket_management_system.model.Ticket;
 import com.tics.ticket_management_system.model.TicketStatus;
@@ -25,15 +26,18 @@ public class TicketService {
         return ticketRepository.findById(id);
     }
 
+    // @Transactional asegura que si algo falla dentro, se haga un rollback automático
+    @Transactional 
     public Optional<Ticket> bookTicket(Long id) {
-        Optional<Ticket> ticketOptional = ticketRepository.findById(id);
+        // 1. Buscamos usando el método con bloqueo pesimista
+        Optional<Ticket> ticketOptional = ticketRepository.findByIdWithLock(id);
 
         if (ticketOptional.isPresent()) {
             Ticket ticket = ticketOptional.get();
             
             if (ticket.getStatus() == TicketStatus.AVAILABLE) {
-                ticket.setStatus(TicketStatus.SOLD); 
-                return Optional.of(ticketRepository.save(ticket)); // Save the updated ticket in H2 and return it
+                ticket.setStatus(TicketStatus.SOLD);
+                return Optional.of(ticketRepository.save(ticket));
             }
         }
         
