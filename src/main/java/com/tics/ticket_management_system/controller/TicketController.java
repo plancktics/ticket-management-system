@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tics.ticket_management_system.model.Ticket;
@@ -29,8 +30,11 @@ public class TicketController {
 
     // (POST http://localhost:8080/api/tickets/{id}/book)
     @PostMapping("/{id}/book")
-    public ResponseEntity<Ticket> bookTicket(@PathVariable Long id) {
-        Ticket bookedTicket = ticketService.bookTicket(id);
+    public ResponseEntity<Ticket> bookTicket(
+            @PathVariable Long id,
+            @RequestParam Long userId) { // (?userId=1)
+
+        Ticket bookedTicket = ticketService.bookTicket(id, userId);
         return ResponseEntity.ok(bookedTicket);
     }
 }

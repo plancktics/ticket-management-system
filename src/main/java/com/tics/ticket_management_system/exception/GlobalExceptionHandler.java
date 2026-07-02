@@ -50,4 +50,29 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientBalance(InsufficientBalanceException ex, HttpServletRequest request) {
+        ErrorResponse error = new ErrorResponse(
+                java.time.LocalDateTime.now(),
+                HttpStatus.PAYMENT_REQUIRED.value(), // 402 
+                "Payment Required",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(error, HttpStatus.PAYMENT_REQUIRED);
+    }
+
+    @ExceptionHandler(TicketPurchaseLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleLimitExceeded(TicketPurchaseLimitExceededException ex, HttpServletRequest request) {
+        ErrorResponse error = new ErrorResponse(
+                java.time.LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(), // 400
+                "Bad Request",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
 }
