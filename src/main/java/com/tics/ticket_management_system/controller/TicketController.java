@@ -30,8 +30,7 @@ public class TicketController {
     // (POST http://localhost:8080/api/tickets/{id}/book)
     @PostMapping("/{id}/book")
     public ResponseEntity<Ticket> bookTicket(@PathVariable Long id) {
-        return ticketService.bookTicket(id)
-                .map(ResponseEntity::ok) // 200 OK 
-                .orElse(ResponseEntity.badRequest().build()); // 400 Bad Request
+        Ticket bookedTicket = ticketService.bookTicket(id);
+        return ResponseEntity.ok(bookedTicket);
     }
 }

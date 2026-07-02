@@ -6,8 +6,9 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tics.ticket_management_system.exception.ResourceNotFoundException;
+import com.tics.ticket_management_system.exception.TicketAlreadySoldException;
 import com.tics.ticket_management_system.model.Ticket;
-import com.tics.ticket_management_system.model.TicketStatus;
 import com.tics.ticket_management_system.repository.TicketRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -27,20 +28,16 @@ public class TicketService {
     }
 
     // @Transactional asegura que si algo falla dentro, se haga un rollback automático
-    @Transactional 
-    public Optional<Ticket> bookTicket(Long id) {
-        // 1. Buscamos usando el método con bloqueo pesimista
-        Optional<Ticket> ticketOptional = ticketRepository.findByIdWithLock(id);
+    @Transactional
+    public Ticket bookTicket(Long id) { 
+        Ticket ticket = ticketRepository.findByIdWithLock(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with ID: " + id));
 
-        if (ticketOptional.isPresent()) {
-            Ticket ticket = ticketOptional.get();
-            
-            if (ticket.getStatus() == TicketStatus.AVAILABLE) {
-                ticket.setStatus(TicketStatus.SOLD);
-                return Optional.of(ticketRepository.save(ticket));
-            }
+        if (ticket.getStatus() == com.tics.ticket_management_system.model.TicketStatus.SOLD) {
+            throw new TicketAlreadySoldException("Ticket with ID " + id + " is already sold.");
         }
-        
-        return Optional.empty();
+
+        ticket.setStatus(com.tics.ticket_management_system.model.TicketStatus.SOLD);
+        return ticketRepository.save(ticket);
     }
 }
