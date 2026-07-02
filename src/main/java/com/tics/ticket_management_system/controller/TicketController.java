@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tics.ticket_management_system.model.Ticket;
+import com.tics.ticket_management_system.dto.TicketDTO;
 import com.tics.ticket_management_system.service.TicketService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,17 +24,17 @@ public class TicketController {
 
     // (GET http://localhost:8080/api/tickets)
     @GetMapping
-    public List<Ticket> getAllTickets() {
-        return ticketService.getAllTickets();
+    public ResponseEntity<List<TicketDTO>> getAllTickets() {
+        return ResponseEntity.ok(ticketService.getAllTickets());
     }
 
     // (POST http://localhost:8080/api/tickets/{id}/book)
     @PostMapping("/{id}/book")
-    public ResponseEntity<Ticket> bookTicket(
+    public ResponseEntity<TicketDTO> bookTicket(
             @PathVariable Long id,
             @RequestParam Long userId) { // (?userId=1)
 
-        Ticket bookedTicket = ticketService.bookTicket(id, userId);
+        TicketDTO bookedTicket = ticketService.bookTicket(id, userId);
         return ResponseEntity.ok(bookedTicket);
     }
 }

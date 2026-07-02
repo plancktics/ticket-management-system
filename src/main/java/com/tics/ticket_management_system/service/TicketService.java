@@ -2,10 +2,12 @@ package com.tics.ticket_management_system.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tics.ticket_management_system.dto.TicketDTO;
 import com.tics.ticket_management_system.exception.InsufficientBalanceException;
 import com.tics.ticket_management_system.exception.ResourceNotFoundException;
 import com.tics.ticket_management_system.exception.TicketAlreadySoldException;
@@ -25,17 +27,39 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
 
-    public List<Ticket> getAllTickets() {
-        return ticketRepository.findAll();
+    public List<TicketDTO> getAllTickets() {
+        return ticketRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Ticket> getTicketById(Long id) {
+    public Optional<Ticket> getTicketById(Long id) { //No locks
         return ticketRepository.findById(id);
+    }
+
+    private TicketDTO convertToDTO(Ticket ticket) {
+        TicketDTO dto = new TicketDTO();
+        dto.setId(ticket.getId());
+        dto.setTicketCode(ticket.getTicketCode());
+        dto.setPrice(ticket.getPrice());
+        dto.setStatus(ticket.getStatus().name());
+
+        if (ticket.getEvent() != null) {
+            dto.setEventTitle(ticket.getEvent().getTitle());
+        }
+
+        if (ticket.getUser() != null) {
+            dto.setPurchaserName(ticket.getUser().getName());
+        } else {
+            dto.setPurchaserName("None (Available)");
+        }
+
+        return dto;
     }
 
     // @Transactional asegura que si algo falla dentro, se haga un rollback automático
     @Transactional
-    public Ticket bookTicket(Long id, Long userId) {
+    public TicketDTO bookTicket(Long id, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
@@ -63,7 +87,8 @@ public class TicketService {
         user.setBalance(user.getBalance().subtract(ticket.getPrice()));
 
         ticket.setStatus(TicketStatus.SOLD);
-        ticket.setUser(user); 
-        return ticketRepository.save(ticket);
+        ticket.setUser(user);
+        Ticket savedTicket = ticketRepository.save(ticket);
+        return this.convertToDTO(savedTicket);
     }
 }

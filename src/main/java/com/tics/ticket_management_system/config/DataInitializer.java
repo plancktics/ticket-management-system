@@ -51,8 +51,8 @@ public class DataInitializer {
             ticketRepository.save(ticket1);
             ticketRepository.save(ticket2);
 
-            User user1 = new User("daniel@email.com", "estua", new BigDecimal("10.00")); 
-            User user2 = new User("carla@email.com", "Carla", new BigDecimal("15.00"));  
+            User user1 = new User("daniel@email.com", "estua", new BigDecimal("100.00")); 
+            User user2 = new User("carla@email.com", "Carla", new BigDecimal("150.00"));  
             userRepository.save(user1);
             userRepository.save(user2);
 
