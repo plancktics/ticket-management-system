@@ -26,6 +26,8 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
+    private final QrCodeService qrCodeService;
+    private final EmailService emailService;
 
     public List<TicketDTO> getAllTickets() {
         return ticketRepository.findAll().stream()
@@ -89,6 +91,17 @@ public class TicketService {
         ticket.setStatus(TicketStatus.SOLD);
         ticket.setUser(user);
         Ticket savedTicket = ticketRepository.save(ticket);
+
+        byte[] qrBytes = qrCodeService.generateQrCodeImage(savedTicket.getTicketCode());
+
+        emailService.sendTicketConfirmationEmail(
+                user.getEmail(),
+                user.getName(),
+                savedTicket.getEvent().getTitle(),
+                savedTicket.getTicketCode(),
+                qrBytes
+        );
+
         return this.convertToDTO(savedTicket);
     }
 }
